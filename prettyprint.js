@@ -1,4 +1,4 @@
-export const prettyPrint = (node, prefix = "", isLeft = true) => {
+const prettyPrint = (node, prefix = "", isLeft = true) => {
     if (node === null) {
       return;
     }
@@ -10,3 +10,5 @@ export const prettyPrint = (node, prefix = "", isLeft = true) => {
       prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
     }
   };
+
+  export default prettyPrint;
