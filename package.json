@@ -1,0 +1,21 @@
+{
+  
+  "name": "binary-search-tree",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "The Odin Project - Binary Search Tree",
+  "main": "node.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polystate/binary-search-tree.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/polystate/binary-search-tree/issues"
+  },
+  "homepage": "https://github.com/polystate/binary-search-tree#readme"
+}
