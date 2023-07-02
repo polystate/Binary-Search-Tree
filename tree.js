@@ -27,38 +27,26 @@ const Tree = (arr) => {
     
     return currentNode;
   };
-
+  
   const traverse = (node, visited) => {
-    if(visited.left === null && visited.right === null){
-      (node.data > visited.data) ? visited.right = node : visited.left = node;
-      console.log(visited);
+    //Check if duplicate
+    if(node.data === visited.data) return;
+
+    let direction;
+    (node.data < visited.data) ? direction = 'left' : direction = 'right';
+
+    if(visited[direction] === null){
+      visited[direction] = node;
       prettyPrint(currentRoot);
       return;
     }
 
-    if(node.data < visited.data){
-      if(visited.left === null){
-        //check if semi-leaf
-        visited.left = node;
-        prettyPrint(currentRoot);
-        return;
-      }
-      visited = visited.left;
-      traverse(node, visited)
-    } else {
-      if(visited.right === null){
-        //check if semi-leaf
-        visited.right = node;
-        prettyPrint(currentRoot);
-        return;
-      }
-      visited = visited.right;
-      traverse(node, visited);
-    }
+    traverse(node, visited[direction]);
   }
 
   const insertNode = (val) => {
-   //create new node
+    if(isNaN(val)) return;
+
     const newNode = createNode(val);
     traverse(newNode, currentRoot);
   }
@@ -69,15 +57,14 @@ const Tree = (arr) => {
 const myTree = Tree([1,7,4,23,8,9,4,3,5,7,9,67,6345,324]);
 const initializeTree = myTree.initializeTree();
 prettyPrint(myTree.buildTree(initializeTree));
-// myTree.insertNode(6);
-// myTree.insertNode(29);
-// myTree.insertNode(4.4);
-
-// myTree.insertNode(9378);
-// myTree.insertNode(30);
-// myTree.insertNode(28);
-// myTree.insertNode(29.5);
-// myTree.insertNode(25);
+myTree.insertNode(6);
+myTree.insertNode(29);
+myTree.insertNode(4.4);
+myTree.insertNode(9378);
+myTree.insertNode(30);
+myTree.insertNode(28);
+myTree.insertNode(29.5);
+myTree.insertNode(25);
 myTree.insertNode(0.5);
 myTree.insertNode(29);
 myTree.insertNode(30);
@@ -85,16 +72,4 @@ myTree.insertNode(30.5);
 myTree.insertNode(6);
 myTree.insertNode(0.25);
 myTree.insertNode(0.75);
-
-
-
-
-//Steps to Insert
-
-
-//To insert into the tree it must become a leaf of the tree.
-
-
-//1. Compare value to the root. Is it less than or greater than. If less, continue
-//recursing down the left subtree is it less than that value, if so is there anything to the left of it, 
-//if not it becomes the leaf.
+myTree.insertNode('sdfg');
