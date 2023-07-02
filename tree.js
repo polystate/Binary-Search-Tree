@@ -10,7 +10,7 @@ const Tree = (arr) => {
     return nodeArr;
   };
 
-  const buildTree = (arr) => {
+  const buildTree = (arr, nodeParent = null) => {
     if (arr.length === 0) return null;
 
     const rootIndex = Math.floor(arr.length / 2);
@@ -19,39 +19,85 @@ const Tree = (arr) => {
     const leftSubArr = arr.slice(0, rootIndex);
     const rightSubArr = arr.slice(rootIndex + 1);
 
-    currentNode.left = buildTree(leftSubArr);
-    currentNode.right = buildTree(rightSubArr);
-
+    currentNode.left = buildTree(leftSubArr, currentNode);
+    currentNode.right = buildTree(rightSubArr, currentNode);
+    currentNode.parent = nodeParent;
+    
     //Set root node before returning object properties
-    currentRoot = arr[Math.floor(arr.length/2)];
+    currentRoot = arr[Math.floor(arr.length / 2)];
     
     return currentNode;
   };
+
+  const isDuplicate = (data, visited) => {
+    return data === visited.data;
+  }
   
-  const traverse = (node, visited) => {
-    //Check if duplicate
-    if(node.data === visited.data) return;
-
+  const traverse = (data, visited) => {
     let direction;
-    (node.data < visited.data) ? direction = 'left' : direction = 'right';
+    (data < visited.data) ? direction = 'left' : direction = 'right';
 
-    if(visited[direction] === null){
-      visited[direction] = node;
+    return direction;
+  }
+
+  const inputTraverse = (node, visited) => {
+    if(isDuplicate(node.data, visited)) return;
+
+    const currentDirection = traverse(node.data, visited);
+
+    //Finding the leaf
+    if(visited[currentDirection] === null){
+      visited[currentDirection] = node;
+      node.parent = visited;
       prettyPrint(currentRoot);
       return;
     }
 
-    traverse(node, visited[direction]);
+    inputTraverse(node, visited[currentDirection]);
   }
 
-  const insertNode = (val) => {
-    if(isNaN(val)) return;
+  const deleteTraverse = (data, visited) => {
+    if(isDuplicate(data, visited)){
+      const parent = visited.parent;
+      (parent.right.data === data) ? parent.right = null : parent.left = null;
+      prettyPrint(currentRoot);
+      return;
+    }
+   
+    const currentDirection = traverse(data, visited);
 
-    const newNode = createNode(val);
-    traverse(newNode, currentRoot);
+    deleteTraverse(data, visited[currentDirection]);  
   }
 
-  return { buildTree, initializeTree, insertNode };
+  const insertNode = (data) => {
+    try {
+    if(isNaN(data)) throw new Error('Invalid value. Expected a number.');
+    const newNode = createNode(data);
+    inputTraverse(newNode, currentRoot);
+    } catch(error) {
+      console.error(error.message);
+    }
+  }
+
+  const deleteNode = (data) => {
+    console.log(data);
+    deleteTraverse(data, currentRoot);
+    //Deleting Nodes
+    //1. If it's a leaf, you just remove it. Simple.
+    //2. If the targeted node only has one child, you simply change its parents pointer
+    //to the child. this automatically deletes the targeted node.
+    //3. If removing a node that has two children. Here, we find the thing in the tree
+    //that is the next biggest, by looking in the right subtree. We find the
+    //node that is the next biggest in its right subtree, we take that node and
+    //replace our targeted node with that next biggest node. that's it. first you delete
+    //that next biggest node (usually it's a leaf, sometimes not) and then replace it
+    //with the original targeted node.
+    //so in summary, we look for the smallest thing in its right subtree and we recursively
+    //remove the smallest thing in its right subtree, take the key in that node
+    //and replace that key with the original thing we were trying to remove.
+  }
+
+  return { buildTree, initializeTree, insertNode, deleteNode };
 };
 
 const myTree = Tree([1,7,4,23,8,9,4,3,5,7,9,67,6345,324]);
@@ -72,4 +118,10 @@ myTree.insertNode(30.5);
 myTree.insertNode(6);
 myTree.insertNode(0.25);
 myTree.insertNode(0.75);
-myTree.insertNode('sdfg');
+myTree.insertNode(19);
+myTree.deleteNode(6);
+
+
+
+
+
