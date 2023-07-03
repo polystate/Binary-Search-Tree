@@ -122,7 +122,17 @@ const Tree = (arr) => {
     findNode(data, visited[currentDirection]);
   }
 
-  return { buildTree, initializeTree, insertNode, deleteNode, findNode };
+  const levelOrder = (func) => {
+    const queue = [currentRoot];
+    while(queue.length){
+      let dequeued = queue.shift();
+      (func) ? func(dequeued) : console.log(dequeued);
+      dequeued.left && queue.push(dequeued.left);
+      dequeued.right && queue.push(dequeued.right);
+    }
+  }
+
+  return { buildTree, initializeTree, insertNode, deleteNode, findNode, levelOrder };
 };
 
 const myTree = Tree([1,7,4,23,8,9,4,3,5,7,9,67,6345,324]);
@@ -153,7 +163,7 @@ myTree.findNode(4.2);
 myTree.findNode(29);
 myTree.findNode(19);
 myTree.findNode(9378);
-
+myTree.levelOrder(prettyPrint);
 
 
 
