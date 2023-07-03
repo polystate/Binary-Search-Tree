@@ -49,7 +49,6 @@ const Tree = (arr) => {
     if(visited[currentDirection] === null){
       visited[currentDirection] = node;
       node.parent = visited;
-      prettyPrint(currentRoot);
       return;
     }
 
@@ -59,8 +58,44 @@ const Tree = (arr) => {
   const deleteTraverse = (data, visited) => {
     if(isDuplicate(data, visited)){
       const parent = visited.parent;
+      //Case 1, visited is a leaf
+      if(visited.left === null && visited.right === null){
+      console.log('its a leaf');
       (parent.right.data === data) ? parent.right = null : parent.left = null;
-      prettyPrint(currentRoot);
+      } else if(visited.left !== null && visited.right !== null) {
+        //Case 2, it has two children
+        console.log('it has two children');
+        
+        let rightSubTreeRoot = visited.right;
+        while(rightSubTreeRoot.left){
+          rightSubTreeRoot = rightSubTreeRoot.left;
+        }
+        
+        rightSubTreeRoot.parent.left = null;
+        currentRoot.data = rightSubTreeRoot.data;
+      } else {
+        //Case 3, it has one child
+        if(parent.left.data === visited.data){
+          //parent is to the right of the child
+          (visited.right) ? parent.left = visited.right : parent.left = visited.left;
+          //set visited.right or visited.left's parent to parent,
+          //as it is still set to the deleted node
+          if(visited.right){
+            parent.left = visited.right;
+            visited.right.parent = parent;
+          } else {
+            parent.left = visited.left;
+            visited.left.parent = parent;
+          }
+        } else if(parent.right.data === visited.data) {
+          //parent is to the left of the child
+          (visited.right) ? parent.right = visited.right : parent.right = visited.left;
+        }
+        //set child parent to null to avoid bug
+        // visited.parent = null;
+        // visited.right.parent = null;
+      }
+    
       return;
     }
    
@@ -74,6 +109,7 @@ const Tree = (arr) => {
     if(isNaN(data)) throw new Error('Invalid value. Expected a number.');
     const newNode = createNode(data);
     inputTraverse(newNode, currentRoot);
+    prettyPrint(currentRoot);
     } catch(error) {
       console.error(error.message);
     }
@@ -82,6 +118,7 @@ const Tree = (arr) => {
   const deleteNode = (data) => {
     console.log(data);
     deleteTraverse(data, currentRoot);
+    prettyPrint(currentRoot);
     //Deleting Nodes
     //1. If it's a leaf, you just remove it. Simple.
     //2. If the targeted node only has one child, you simply change its parents pointer
@@ -95,6 +132,15 @@ const Tree = (arr) => {
     //so in summary, we look for the smallest thing in its right subtree and we recursively
     //remove the smallest thing in its right subtree, take the key in that node
     //and replace that key with the original thing we were trying to remove.
+    
+    //so basically, the algorithm for two children is. go to your right child. then recursively keep 
+    //calling .left child over and over until you reach null. that node before null is next biggest,
+    //you delete that node and replace it with your starting point. but make sure that in that subtree that 
+    //its right child (if it has one) is properly being pointed to by its parent in that subtree.
+  
+    //Bug - the bug is that when 9 gets deleted, it only gets deleted
+    //as the parent's child, but the child still contains reference
+    //to the parent
   }
 
   return { buildTree, initializeTree, insertNode, deleteNode };
@@ -120,6 +166,10 @@ myTree.insertNode(0.25);
 myTree.insertNode(0.75);
 myTree.insertNode(19);
 myTree.deleteNode(6);
+myTree.deleteNode(9);
+myTree.deleteNode(28);
+myTree.deleteNode(7);
+myTree.deleteNode(8);
 
 
 

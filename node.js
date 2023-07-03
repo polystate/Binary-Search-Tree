@@ -1,7 +1,7 @@
 //Node
 
-const Node = (data = "", left = null, right = null) => {
-    return { data, left, right }
+const Node = (data = "", left = null, right = null, parent = null) => {
+    return { data, left, right, parent }
 }
 
 
