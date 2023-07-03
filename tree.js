@@ -59,48 +59,30 @@ const Tree = (arr) => {
     if(isDuplicate(data, visited)){
       const parent = visited.parent;
       //Case 1, visited is a leaf
-      if(visited.left === null && visited.right === null){
-      console.log('its a leaf');
+      if(!visited.left && !visited.right){
       (parent.right.data === data) ? parent.right = null : parent.left = null;
-      } else if(visited.left !== null && visited.right !== null) {
+      } else if((visited.left) && (visited.right)) {
         //Case 2, it has two children
-        console.log('it has two children');
-        
         let rightSubTreeRoot = visited.right;
         while(rightSubTreeRoot.left){
           rightSubTreeRoot = rightSubTreeRoot.left;
         }
-        
         rightSubTreeRoot.parent.left = null;
         currentRoot.data = rightSubTreeRoot.data;
       } else {
         //Case 3, it has one child
+        const branch = visited.right || visited.left;
         if(parent.left.data === visited.data){
-          //parent is to the right of the child
-          (visited.right) ? parent.left = visited.right : parent.left = visited.left;
-          //set visited.right or visited.left's parent to parent,
-          //as it is still set to the deleted node
-          if(visited.right){
-            parent.left = visited.right;
-            visited.right.parent = parent;
-          } else {
-            parent.left = visited.left;
-            visited.left.parent = parent;
-          }
-        } else if(parent.right.data === visited.data) {
-          //parent is to the left of the child
-          (visited.right) ? parent.right = visited.right : parent.right = visited.left;
+          parent.left = branch;
+        } else if (parent.right.data === visited.data){
+          parent.right = branch;
         }
-        //set child parent to null to avoid bug
-        // visited.parent = null;
-        // visited.right.parent = null;
+        branch.parent = parent;
       }
-    
       return;
     }
    
     const currentDirection = traverse(data, visited);
-
     deleteTraverse(data, visited[currentDirection]);  
   }
 
@@ -116,34 +98,31 @@ const Tree = (arr) => {
   }
 
   const deleteNode = (data) => {
-    console.log(data);
-    deleteTraverse(data, currentRoot);
-    prettyPrint(currentRoot);
-    //Deleting Nodes
-    //1. If it's a leaf, you just remove it. Simple.
-    //2. If the targeted node only has one child, you simply change its parents pointer
-    //to the child. this automatically deletes the targeted node.
-    //3. If removing a node that has two children. Here, we find the thing in the tree
-    //that is the next biggest, by looking in the right subtree. We find the
-    //node that is the next biggest in its right subtree, we take that node and
-    //replace our targeted node with that next biggest node. that's it. first you delete
-    //that next biggest node (usually it's a leaf, sometimes not) and then replace it
-    //with the original targeted node.
-    //so in summary, we look for the smallest thing in its right subtree and we recursively
-    //remove the smallest thing in its right subtree, take the key in that node
-    //and replace that key with the original thing we were trying to remove.
+    try {
+      if(isNaN(data)) throw new Error('Invalid value. Expected a number.');
+      deleteTraverse(data, currentRoot);
+      prettyPrint(currentRoot);
+      } catch(error) {
+        console.error(error.message);
+      }
     
-    //so basically, the algorithm for two children is. go to your right child. then recursively keep 
-    //calling .left child over and over until you reach null. that node before null is next biggest,
-    //you delete that node and replace it with your starting point. but make sure that in that subtree that 
-    //its right child (if it has one) is properly being pointed to by its parent in that subtree.
-  
-    //Bug - the bug is that when 9 gets deleted, it only gets deleted
-    //as the parent's child, but the child still contains reference
-    //to the parent
   }
 
-  return { buildTree, initializeTree, insertNode, deleteNode };
+  const findNode = (data, visited = currentRoot) => {
+    console.log('Step: ' + visited.data);
+    if(isDuplicate(data, visited)){
+      console.log('Node was found!');
+      return visited;
+    }
+    const currentDirection = traverse(data, visited);
+    if(!visited[currentDirection]){
+      console.log('Node of ' + data + ' not found.');
+      return;
+    }
+    findNode(data, visited[currentDirection]);
+  }
+
+  return { buildTree, initializeTree, insertNode, deleteNode, findNode };
 };
 
 const myTree = Tree([1,7,4,23,8,9,4,3,5,7,9,67,6345,324]);
@@ -170,6 +149,10 @@ myTree.deleteNode(9);
 myTree.deleteNode(28);
 myTree.deleteNode(7);
 myTree.deleteNode(8);
+myTree.findNode(4.2);
+myTree.findNode(29);
+myTree.findNode(19);
+myTree.findNode(9378);
 
 
 
