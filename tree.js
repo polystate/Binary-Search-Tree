@@ -122,6 +122,8 @@ const Tree = (arr) => {
     findNode(data, visited[currentDirection]);
   }
 
+  //breadth-first approach
+
   const levelOrder = (func) => {
     const queue = [currentRoot];
     while(queue.length){
@@ -132,12 +134,67 @@ const Tree = (arr) => {
     }
   }
 
-  return { buildTree, initializeTree, insertNode, deleteNode, findNode, levelOrder };
+  //depth-first approach
+
+  const depthFirst = (method, func, current = currentRoot) => {
+    if(!current){
+      return;
+    }
+
+    switch(method){
+      case "inorder":
+        depthFirst(method, func, current.left);
+        (func) ? func(current) : console.log(current.data);
+        depthFirst(method, func, current.right);
+        break;
+      case "preorder":
+        (func) ? func(current) : console.log(current.data);
+        depthFirst(method, func, current.left);
+        depthFirst(method, func, current.right);
+        break;
+      case "postorder":
+        depthFirst(method, func, current.left);
+        depthFirst(method, func, current.right);
+        (func) ? func(current) : console.log(current.data);
+        break;
+      default:
+        console.log("Method not recognized.");
+    }
+  }
+  
+  // const inorder = (current = currentRoot) => {
+  //   if(!current){
+  //     return;
+  //   }
+  //   inorder(current.left);
+  //   console.log(current.data);
+  //   inorder(current.right);
+  // }
+
+  // const preorder = (current = currentRoot) => {
+  //   if(!current){
+  //     return;
+  //   }
+  //   console.log(current.data);
+  //   preorder(current.left);
+  //   preorder(current.right);
+  // }
+
+  // const postorder = (current = currentRoot) => {
+  //   if(!current){
+  //     return;
+  //   }
+  //   postorder(current.left);
+  //   postorder(current.right);
+  //   console.log(current.data);
+  // }
+
+  return { buildTree, initializeTree, insertNode, deleteNode, findNode, levelOrder, depthFirst };
 };
 
 const myTree = Tree([1,7,4,23,8,9,4,3,5,7,9,67,6345,324]);
-const initializeTree = myTree.initializeTree();
-prettyPrint(myTree.buildTree(initializeTree));
+const initialized = myTree.initializeTree();
+prettyPrint(myTree.buildTree(initialized));
 myTree.insertNode(6);
 myTree.insertNode(29);
 myTree.insertNode(4.4);
@@ -164,6 +221,9 @@ myTree.findNode(29);
 myTree.findNode(19);
 myTree.findNode(9378);
 myTree.levelOrder(prettyPrint);
+myTree.depthFirst("inorder");
+myTree.depthFirst("preorder");
+myTree.depthFirst("postorder");
 
 
 
