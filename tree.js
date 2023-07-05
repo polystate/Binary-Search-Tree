@@ -56,35 +56,51 @@ const Tree = (arr) => {
   }
 
   const deleteTraverse = (data, visited) => {
-    if(isDuplicate(data, visited)){
+    if (isDuplicate(data, visited)) {
       const parent = visited.parent;
-      //Case 1, visited is a leaf
-      if(!visited.left && !visited.right){
-      (parent.right.data === data) ? parent.right = null : parent.left = null;
-      } else if((visited.left) && (visited.right)) {
-        //Case 2, it has two children
-        let rightSubTreeRoot = visited.right;
-        while(rightSubTreeRoot.left){
+  
+      if (!visited.left && !visited.right) {
+        // Case 1: visited is a leaf
+        if (parent && parent.left === visited) {
+          parent.left = null;
+        } else if (parent && parent.right === visited) {
+          parent.right = null;
+        } else if (!parent) {
+          currentRoot = null; // Update currentRoot if visited is the root node
+        }
+      } else if (visited.left && visited.right) {
+        // Case 2: visited has two children
+        let rightSubTreeRoot = visited.right; 
+        while (rightSubTreeRoot.left) {
           rightSubTreeRoot = rightSubTreeRoot.left;
         }
-        rightSubTreeRoot.parent.left = null;
-        currentRoot.data = rightSubTreeRoot.data;
-      } else {
-        //Case 3, it has one child
-        const branch = visited.right || visited.left;
-        if(parent.left.data === visited.data){
-          parent.left = branch;
-        } else if (parent.right.data === visited.data){
-          parent.right = branch;
+        if (rightSubTreeRoot.parent.left === rightSubTreeRoot) {
+          rightSubTreeRoot.parent.left = null;
+        } else if (rightSubTreeRoot.parent.right === rightSubTreeRoot) {
+          rightSubTreeRoot.parent.right = null;
         }
-        branch.parent = parent;
+        visited.data = rightSubTreeRoot.data; 
+      } else {
+        // Case 3: visited has one child
+        const branch = visited.right || visited.left;
+        if (parent && parent.left === visited) {
+          parent.left = branch;
+        } else if (parent && parent.right === visited) {
+          parent.right = branch;
+        } else if (!parent) {
+          currentRoot = branch; // Update currentRoot if visited is the root node
+        }
+        if (branch) {
+          branch.parent = parent;
+        }
       }
       return;
     }
-   
+  
     const currentDirection = traverse(data, visited);
-    deleteTraverse(data, visited[currentDirection]);  
-  }
+    deleteTraverse(data, visited[currentDirection]);
+  };
+  
 
   const insertNode = (data) => {
     try {
@@ -109,17 +125,15 @@ const Tree = (arr) => {
   }
 
   const findNode = (data, visited = currentRoot) => {
-    console.log('Step: ' + visited.data);
     if(isDuplicate(data, visited)){
-      console.log('Node was found!');
       return visited;
     }
     const currentDirection = traverse(data, visited);
     if(!visited[currentDirection]){
-      console.log('Node of ' + data + ' not found.');
+      console.error('Node of ' + data + ' was not found.');
       return;
     }
-    findNode(data, visited[currentDirection]);
+    return findNode(data, visited[currentDirection]);
   }
 
   //breadth-first approach
@@ -161,35 +175,38 @@ const Tree = (arr) => {
         console.log("Method not recognized.");
     }
   }
+
+  const getHeight = (data) => {
+    const findHeight = (node) => {
+      if (!node) {
+        return 0;
+      }
+      const leftHeight = findHeight(node.left);
+      const rightHeight = findHeight(node.right);
+      return Math.max(leftHeight, rightHeight) + 1;
+    };
   
-  // const inorder = (current = currentRoot) => {
-  //   if(!current){
-  //     return;
-  //   }
-  //   inorder(current.left);
-  //   console.log(current.data);
-  //   inorder(current.right);
-  // }
+    const node = findNode(data);
+    if (!node) {
+      console.error('Node not found');
+      return;
+    }
+    const height = findHeight(node) - 1; 
+    console.log('Height:', height);
+  };
 
-  // const preorder = (current = currentRoot) => {
-  //   if(!current){
-  //     return;
-  //   }
-  //   console.log(current.data);
-  //   preorder(current.left);
-  //   preorder(current.right);
-  // }
+  const getDepth = (data) => {
+    let node = findNode(data);
+    let parentCount = 0;
+    while(node.parent){
+      node = node.parent;
+      parentCount++;
+    }
+    console.log('Depth of: ' + parentCount);
+    return parentCount;
+  }
 
-  // const postorder = (current = currentRoot) => {
-  //   if(!current){
-  //     return;
-  //   }
-  //   postorder(current.left);
-  //   postorder(current.right);
-  //   console.log(current.data);
-  // }
-
-  return { buildTree, initializeTree, insertNode, deleteNode, findNode, levelOrder, depthFirst };
+  return { buildTree, initializeTree, insertNode, deleteNode, findNode, levelOrder, depthFirst, getHeight, getDepth };
 };
 
 const myTree = Tree([1,7,4,23,8,9,4,3,5,7,9,67,6345,324]);
@@ -220,10 +237,17 @@ myTree.findNode(4.2);
 myTree.findNode(29);
 myTree.findNode(19);
 myTree.findNode(9378);
-myTree.levelOrder(prettyPrint);
-myTree.depthFirst("inorder");
-myTree.depthFirst("preorder");
-myTree.depthFirst("postorder");
+// myTree.levelOrder(prettyPrint);
+// myTree.depthFirst("inorder");
+// myTree.depthFirst("preorder");
+// myTree.depthFirst("postorder");
+myTree.getHeight(19);
+myTree.getHeight(67);
+myTree.getHeight(0.25);
+myTree.getDepth(0.5);
+myTree.getDepth(29.5);
+myTree.getDepth(19);
+myTree.getDepth(23);
 
 
 
