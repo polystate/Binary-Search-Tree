@@ -1,4 +1,5 @@
 import createNode from './node.js';
+import rebalance from './utils.js';
 import prettyPrint from './prettyprint.js';
 
 const Tree = (arr) => {
@@ -206,7 +207,36 @@ const Tree = (arr) => {
     return parentCount;
   }
 
-  return { buildTree, initializeTree, insertNode, deleteNode, findNode, levelOrder, depthFirst, getHeight, getDepth };
+  const isBalanced = () => {
+    const checkHeight = (node) => {
+      if (!node) {
+        return 0;
+      }
+
+      const leftHeight = checkHeight(node.left);
+      if (leftHeight === -1) {
+        return -1;
+      }
+
+      const rightHeight = checkHeight(node.right);
+      if (rightHeight === -1) {
+        return -1;
+      }
+
+      const heightDiff = Math.abs(leftHeight - rightHeight);
+      if (heightDiff > 1) {
+        return -1;
+      }
+
+      return Math.max(leftHeight, rightHeight) + 1;
+    };
+
+    return checkHeight(currentRoot) !== -1;
+  };
+
+  
+
+  return { buildTree, initializeTree, insertNode, deleteNode, findNode, levelOrder, depthFirst, getHeight, getDepth, isBalanced };
 };
 
 const myTree = Tree([1,7,4,23,8,9,4,3,5,7,9,67,6345,324]);
@@ -248,7 +278,9 @@ myTree.getDepth(0.5);
 myTree.getDepth(29.5);
 myTree.getDepth(19);
 myTree.getDepth(23);
+myTree.isBalanced();
 
-
-
-
+//Rebalance Tree
+const rebalancedTree = rebalance(myTree);
+const r_initialized = rebalancedTree.initializeTree();
+prettyPrint(rebalancedTree.buildTree(r_initialized));
